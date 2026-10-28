@@ -4,7 +4,7 @@ using TMPro;
 public class StarsManagerCollector : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI starsText;
-    [SerializeField] private int amoundCollected;
+    public int amoundCollected;
 
     void Start()
     {

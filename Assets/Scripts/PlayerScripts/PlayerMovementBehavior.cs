@@ -1,56 +1,65 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovementBehavior : MonoBehaviour
 {
-    private Rigidbody rb;
     [SerializeField] private float currentSpeed;
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float runSpeed = 8f;
-    [SerializeField] private bool isPressed;
-    private float moveHorizontal;
-    private float moveVertical;
-    private Vector3 moveDirection;
+    [SerializeField] private float rotationSpeed = 10f;
+    [SerializeField] private InputActionReference moveAction;
 
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip walkSound;
-    [SerializeField] private AudioClip runSound;
+    private Rigidbody rb;
+    private Vector3 moveDirection;
+    private Vector2 moveInput;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        audioSource = GetComponent<AudioSource>();
-        isPressed = false;
     }
+    void OnEnable()
+    {
+        moveAction.action.Enable();
+    }
+    
+    void OnDisable()
+    {
+        moveAction.action.Disable();
+    }
+
+    private Quaternion smoothRotation;
     void Update()
     {
-        moveHorizontal = Input.GetAxis("Horizontal");
-        moveVertical = Input.GetAxis("Vertical");
-
-        moveDirection = new Vector3(moveHorizontal, 0f, moveVertical).normalized;
-
+        moveInput = moveAction.action.ReadValue<Vector2>();
+        moveDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
         if(Input.GetKey(KeyCode.LeftShift))
         {
-            isPressed = true;
+            Run();
         }
         else
         {
-            isPressed = false;
+            Walk();
         }
-
-        if(isPressed)
+        if (moveDirection.sqrMagnitude > 0.01f)
         {
-            currentSpeed = runSpeed;
-            audioSource.Play();
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+            Quaternion smoothRotation = Quaternion.Lerp(rb.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
-        else
-        {
-            currentSpeed = walkSpeed;
-        }
+        rb.MoveRotation(smoothRotation);
     }
     void FixedUpdate()
     {
-        Vector3 targetVelocity = moveDirection * currentSpeed;
-        targetVelocity.y = rb.linearVelocity.y;
-        rb.linearVelocity = targetVelocity;
+        
+        Vector3 relativeMovement = transform.rotation * moveDirection;
+        rb.MovePosition(transform.position + relativeMovement * currentSpeed * Time.fixedDeltaTime);
+    }
+
+    void Walk()
+    {
+        currentSpeed = walkSpeed;
+    }
+    void Run()
+    {
+        currentSpeed = runSpeed;
     }
 }
