@@ -2,14 +2,10 @@ using UnityEngine;
 
 public class StarsBehavior : MonoBehaviour
 {
-    private Animator starAnimator;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip collectSound;
+    [SerializeField] private GameObject startObject;
 
-    void Start()
-    {
-        starAnimator = GetComponent<Animator>();
-    }
 
     void OnTriggerEnter(Collider other)
     {
@@ -22,8 +18,7 @@ public class StarsBehavior : MonoBehaviour
 
     void StartIsCollected()
     {
-        GetComponent<Collider>().enabled = false;
-        starAnimator.SetBool("IsCollect", true);
+        startObject.SetActive(false);
         audioSource.PlayOneShot(collectSound);
     }
 }

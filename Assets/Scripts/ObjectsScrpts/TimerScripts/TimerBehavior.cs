@@ -4,7 +4,7 @@ using TMPro;
 public class TimerBehavior : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI timerText;
-    [SerializeField] private float amoundTime = 60f;
+    public float amoundTime = 60f;
     public bool isActive;
 
     void Awake()
@@ -26,6 +26,7 @@ public class TimerBehavior : MonoBehaviour
                 isActive = false;
             }
         }
+
     }
 
     void NewTime(float secondsTime)

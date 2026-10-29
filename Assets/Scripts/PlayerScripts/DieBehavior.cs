@@ -9,9 +9,11 @@ public class DieBehavior : MonoBehaviour
 
 
     [SerializeField] private GameObject losePanel;
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip dieSound;
-    [SerializeField] private float volumen;
+
+    [SerializeField] private AudioSource FBXSource;
+    [SerializeField] private AudioClip finalRoarSound;
+
+    private bool isRoar = true;
 
     void Awake()
     {
@@ -29,13 +31,18 @@ public class DieBehavior : MonoBehaviour
     {
         movementPlayer.enabled = false;
         losePanel.SetActive(true);
-        ChangeAudio();
+        if(isRoar)
+        {
+            FinalRoarAudio();
+            isRoar = false;
+        }
+        
     }
 
-    void ChangeAudio()
+    void FinalRoarAudio()
     {
-        audioSource.volume = volumen; 
-        audioSource.clip = dieSound;
-        audioSource.PlayOneShot(dieSound);
+        FBXSource.volume = 0.3f; 
+        FBXSource.clip = finalRoarSound;
+        FBXSource.PlayOneShot(finalRoarSound);
     }
 }

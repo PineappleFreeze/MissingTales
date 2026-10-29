@@ -12,10 +12,14 @@ public class PlayerMovementBehavior : MonoBehaviour
     private Rigidbody rb;
     private Vector3 moveDirection;
     private Vector2 moveInput;
+    private bool isMove;
+
+    [SerializeField] private Animator playerAnimator;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        playerAnimator = GetComponent<Animator>();
     }
     void OnEnable()
     {
@@ -32,6 +36,16 @@ public class PlayerMovementBehavior : MonoBehaviour
     {
         moveInput = moveAction.action.ReadValue<Vector2>();
         moveDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
+        if (moveDirection.sqrMagnitude > 0.01f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+            smoothRotation = Quaternion.Lerp(rb.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
+        else
+        {
+            rb.MoveRotation(smoothRotation);
+        }
+
         if(Input.GetKey(KeyCode.LeftShift))
         {
             Run();
@@ -40,18 +54,32 @@ public class PlayerMovementBehavior : MonoBehaviour
         {
             Walk();
         }
-        if (moveDirection.sqrMagnitude > 0.01f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-            Quaternion smoothRotation = Quaternion.Lerp(rb.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        }
-        rb.MoveRotation(smoothRotation);
+        MoveAnimacion();
+        
+        
     }
+    private void MoveAnimacion()
+    {
+        if(moveInput.sqrMagnitude > 0.01f)
+        {
+            playerAnimator.SetBool("IsWalking",true);
+        }
+        else
+        {
+            playerAnimator.SetBool("IsWalking",false);
+        }
+
+    }
+
     void FixedUpdate()
     {
         
-        Vector3 relativeMovement = transform.rotation * moveDirection;
-        rb.MovePosition(transform.position + relativeMovement * currentSpeed * Time.fixedDeltaTime);
+        if(moveDirection.sqrMagnitude > 0.01f)
+        {
+            rb.MoveRotation(smoothRotation);
+        }
+        Vector3 relativeMovement = moveDirection * currentSpeed;
+        rb.MovePosition(rb.position + relativeMovement * Time.fixedDeltaTime);
     }
 
     void Walk()

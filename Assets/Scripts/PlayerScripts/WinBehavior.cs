@@ -6,6 +6,7 @@ public class WinBehavior : MonoBehaviour
 
     [SerializeField] private GameObject winPanel;
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioSource FBXSource;
     [SerializeField] private AudioClip winSound;
     [SerializeField] private float volumen = 0.5f;
 
@@ -29,8 +30,9 @@ public class WinBehavior : MonoBehaviour
 
     void ChangeAudio()
     {
-        audioSource.volume = volumen; 
-        audioSource.clip = winSound;
-        audioSource.PlayOneShot(winSound);
+        audioSource.Stop();
+        FBXSource.volume = volumen; 
+        FBXSource.clip = winSound;
+        FBXSource.PlayOneShot(winSound);
     }
 }
